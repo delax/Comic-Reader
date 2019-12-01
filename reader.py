@@ -109,6 +109,7 @@ def view_title(filepath):
     filepath = Path(url_unquote(filepath))
     page_num = int(request.query.page or '1')
     resize = bool(int(request.query.resize or '0'))
+    _path_query = '{path!s}?{query!s}' #constant for the url, to make "path/to/comic?query=data"
     
     album_path = root_path / filepath
     if is_useful_file(album_path):
@@ -120,18 +121,18 @@ def view_title(filepath):
         source = Path('/', 'static', 'uncompressed', filepath)
     page_num = min(page_num, number_of_pages)
     return {
-        'image' : '{path!s}?{query!s}'.format(
+        'image' : _path_query.format(
             path = url_quote( source.as_posix() ),
             query = urlencode( {'page' : page_num, 'resize' : int(resize)} )),
-        'next' : '{path!s}?{query!s}'.format(
+        'next' : _path_query.format(
             path = url_quote( filepath.name ),
             query = urlencode( {'page' : min(number_of_pages, page_num+1), 'resize' : int(resize)} )),
-        'prev' : '{path!s}?{query!s}'.format(
+        'prev' : _path_query.format(
             path = url_quote( filepath.name ),
             query = urlencode( {'page' : max(1, page_num-1), 'resize' : int(resize)} )),
         'up' : url_quote( Path('/', 'browse', filepath).parent.as_posix() + '/'),
         'resize_link' : {
-            'href' : '{path!s}?{query!s}'.format(
+            'href' : _path_query.format(
                 path = url_quote( filepath.name ),
                 query = urlencode( {'page' : page_num, 'resize' : int(not resize)} )),
             'title' : 'original' if resize else 'smaller',
